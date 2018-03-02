@@ -12,7 +12,7 @@ public class VideoCard {
     private int memory;
 
     //constructors
-    public VideoCard() {
+    private VideoCard() {
     }
 
     public VideoCard(String name, int temperature, int power, int memory) {

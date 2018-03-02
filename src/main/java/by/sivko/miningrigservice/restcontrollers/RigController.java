@@ -13,8 +13,12 @@ import java.util.List;
 @RestController
 public class RigController {
 
+    private final RigService rigService;
+
     @Autowired
-    RigService rigService;
+    public RigController(RigService rigService) {
+        this.rigService = rigService;
+    }
 
     @RequestMapping(value = "/rigs", method = RequestMethod.GET, produces = "application/json")
     public List<Rig> getRigs() {
