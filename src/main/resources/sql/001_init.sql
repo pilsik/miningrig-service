@@ -1,0 +1,13 @@
+BEGIN  TRANSACTION;
+
+  DROP TABLE IF EXISTS "rigs" CASCADE;
+  DROP SEQUENCE IF EXISTS "rig_seq" CASCADE;
+
+  CREATE SEQUENCE "rig_seq" START 1;
+  CREATE TABLE "rigs" (
+    "id" BIGINT PRIMARY KEY DEFAULT "nextval"('"rig_seq"'),
+    "name" VARCHAR(100)  NOT NULL,
+    "user" VARCHAR(100) NOT NULL
+  );
+
+END TRANSACTION;
