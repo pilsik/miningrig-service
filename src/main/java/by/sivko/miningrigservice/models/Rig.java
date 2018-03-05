@@ -37,6 +37,10 @@ public class Rig implements Serializable{
     public Rig() {
     }
 
+    public Rig(String name) {
+        this.name = name;
+    }
+
     public Rig(String name, String user) {
         this.name = name;
         this.user = user;
