@@ -16,10 +16,13 @@ public class Rig implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rig_gen")
     @SequenceGenerator(name = "rig_gen", sequenceName = "rig_seq")
-    private long id;
+    private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @Transient
     private String miner;
@@ -37,13 +40,9 @@ public class Rig implements Serializable{
     public Rig() {
     }
 
-    public Rig(String name) {
+    public Rig(String name, String password){
         this.name = name;
-    }
-
-    public Rig(String name, String user) {
-        this.name = name;
-        this.user = user;
+        this.password = password;
     }
 
     //getters and setters

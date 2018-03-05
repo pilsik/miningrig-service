@@ -5,6 +5,8 @@ import by.sivko.miningrigservice.models.Rig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RigServiceImpl implements RigService {
 
@@ -24,5 +26,10 @@ public class RigServiceImpl implements RigService {
     @Override
     public Rig removeRigById(Long id) {
         return rigDao.deleteRigById(id);
+    }
+
+    @Override
+    public List<Rig> getRigsById(String user) {
+        return rigDao.getAllRigsByUser(user);
     }
 }

@@ -10,4 +10,8 @@
         <sqlFile path="../sql/001_init.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
 
+    <changeSet id="2_test" author="Sergey Ivko">
+        <sqlFile path="../sql/001_init_test.sql" relativeToChangelogFile="true" stripComments="true"/>
+    </changeSet>
+
 </databaseChangeLog>
