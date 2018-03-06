@@ -1,5 +1,9 @@
 package by.sivko.miningrigservice.models.user;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,12 +18,18 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @Length(min = 3, message = "*Your login must have at least 3 characters")
+    @NotEmpty(message = "*Please provide your login")
     private String username;
 
     @Column(nullable = false)
+    @Length(min = 5, message = "*Your password must have at least 5 characters")
+    @NotEmpty(message = "*Please provide your password")
     private String password;
 
     @Column(nullable = false)
+    @Email(message = "*Please provide a valid Email")
+    @NotEmpty(message = "*Please provide an email")
     private String email;
 
     @Column
@@ -54,6 +64,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Set<UserProfile> getUserProfiles() {
