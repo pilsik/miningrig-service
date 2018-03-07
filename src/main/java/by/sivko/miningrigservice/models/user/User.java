@@ -51,7 +51,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "profile_id")})
     private Set<UserProfile> userProfiles = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Rig> userRigSet = new HashSet<>(0);
 
     public String getUsername() {
@@ -123,7 +123,7 @@ public class User {
     }
 
     public Set<Rig> getUserRigSet() {
-        if(this.userRigSet == null){
+        if (this.userRigSet == null) {
             this.userRigSet = new HashSet<>(0);
         }
         return userRigSet;

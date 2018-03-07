@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "rigs")
-public class Rig implements Serializable{
+public class Rig implements Serializable {
 
     private static final long serialVersionUID = 1227933851518935604L;
 
@@ -32,7 +32,7 @@ public class Rig implements Serializable{
     @Transient
     private String status;
 
-    @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
 
@@ -43,7 +43,7 @@ public class Rig implements Serializable{
     public Rig() {
     }
 
-    public Rig(User user, String name, String password){
+    public Rig(User user, String name, String password) {
         this.user = user;
         this.name = name;
         this.password = password;
