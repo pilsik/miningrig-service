@@ -11,9 +11,6 @@ import java.util.List;
  */
 @Entity
 @Table(name = "rigs")
-@NamedQueries({
-        @NamedQuery(name = "Rig.getAllRigsByUserId", query = "SELECT r FROM Rig r WHERE r.user=:user_value")
-})
 public class Rig implements Serializable{
 
     private static final long serialVersionUID = 1227933851518935604L;
