@@ -10,5 +10,5 @@ public interface RigService {
     Rig addRig(Rig rig);
     Rig getRigById(Long id);
     Rig removeRigById(Long id);
-    List<Rig> getRigsByUsername(String user);
+
 }

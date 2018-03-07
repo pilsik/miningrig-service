@@ -18,10 +18,4 @@ public class RigDaoImpl extends GenericDaoImpl<Rig,Long> implements RigDao {
         return deletedRig;
     }
 
-    @Override
-    public List<Rig> getAllRigsByUserId(User user) {
-        return super.entityManager.createNamedQuery("Rig.getAllRigsByUserId", Rig.class)
-                .setParameter("user_value", user)
-                .getResultList();
-    }
 }

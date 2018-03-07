@@ -10,5 +10,4 @@ public interface RigDao extends GenericDao<Rig,Long> {
 
     Rig deleteRigById(Long id);
 
-    List<Rig> getAllRigsByUserId(User user);
 }

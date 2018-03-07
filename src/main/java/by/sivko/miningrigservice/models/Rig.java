@@ -35,7 +35,7 @@ public class Rig implements Serializable{
     @Transient
     private String status;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
 
@@ -55,6 +55,14 @@ public class Rig implements Serializable{
     //getters and setters
     public String getName() {
         return name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getMiner() {

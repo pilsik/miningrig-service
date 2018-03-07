@@ -1,5 +1,6 @@
 package by.sivko.miningrigservice.models.user;
 
+import by.sivko.miningrigservice.models.Rig;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -50,6 +51,9 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "profile_id")})
     private Set<UserProfile> userProfiles = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private Set<Rig> userRigSet = new HashSet<>(0);
+
     public String getUsername() {
         return username;
     }
@@ -94,6 +98,10 @@ public class User {
         this.credentialsNonExpired = credentialsNonExpired;
     }
 
+    public void setUserRigSet(Set<Rig> userRigSet) {
+        this.userRigSet = userRigSet;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -114,7 +122,10 @@ public class User {
         return enabled;
     }
 
-    public Long getId() {
-        return id;
+    public Set<Rig> getUserRigSet() {
+        if(this.userRigSet == null){
+            this.userRigSet = new HashSet<>(0);
+        }
+        return userRigSet;
     }
 }

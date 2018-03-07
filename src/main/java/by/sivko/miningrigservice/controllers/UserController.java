@@ -4,11 +4,9 @@ import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -44,7 +42,7 @@ public class UserController {
         User userExistsLogin = userService.findUserByUsername(user.getUsername());
         if (userExistsLogin != null) {
             bindingResult
-                    .rejectValue("login", "error.user",
+                    .rejectValue("username", "error.user",
                             "There is already a user registered with the login provided");
         }
         User userExistsEmail = userService.findUserByUsername(user.getEmail());

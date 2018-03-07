@@ -35,9 +35,4 @@ public class RigServiceImpl implements RigService {
         return rigDao.deleteRigById(id);
     }
 
-    @Override
-    public List<Rig> getRigsByUsername(String username) {
-        User user = userService.findUserByUsername(username);
-        return rigDao.getAllRigsByUserId(user);
-    }
 }

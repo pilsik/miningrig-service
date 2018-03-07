@@ -2,6 +2,7 @@ package by.sivko.miningrigservice.services.user;
 
 import by.sivko.miningrigservice.dao.user.UserProfileRepository;
 import by.sivko.miningrigservice.dao.user.UserRepository;
+import by.sivko.miningrigservice.models.Rig;
 import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.models.user.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -41,5 +43,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public User findUserByEmail(String email) {
         return this.userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Set<Rig> getUserRigsByUsername(String username) {
+        User user = this.findUserByUsername(username);
+        return user.getUserRigSet();
     }
 }
