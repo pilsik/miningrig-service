@@ -16,7 +16,7 @@ BEGIN TRANSACTION;
   CREATE TABLE "rigs" (
     "id"   BIGINT PRIMARY KEY DEFAULT "nextval"('"rig_seq"'),
     "name" VARCHAR(100) NOT NULL,
-    "user" VARCHAR(100) NOT NULL,
+    "user_id" BIGINT NOT NULL,
     "password" VARCHAR(100) NOT NULL
   );
 

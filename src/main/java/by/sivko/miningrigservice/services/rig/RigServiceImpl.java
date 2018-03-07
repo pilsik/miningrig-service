@@ -2,16 +2,23 @@ package by.sivko.miningrigservice.services.rig;
 
 import by.sivko.miningrigservice.dao.rig.RigDao;
 import by.sivko.miningrigservice.models.Rig;
+import by.sivko.miningrigservice.models.user.User;
+import by.sivko.miningrigservice.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 public class RigServiceImpl implements RigService {
 
     @Autowired
     RigDao rigDao;
+
+    @Autowired
+    UserService userService;
 
     @Override
     public Rig addRig(Rig rig) {
@@ -29,7 +36,8 @@ public class RigServiceImpl implements RigService {
     }
 
     @Override
-    public List<Rig> getRigsById(String user) {
-        return rigDao.getAllRigsByUser(user);
+    public List<Rig> getRigsByUsername(String username) {
+        User user = userService.findUserByUsername(username);
+        return rigDao.getAllRigsByUserId(user);
     }
 }

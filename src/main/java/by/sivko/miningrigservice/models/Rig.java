@@ -1,5 +1,7 @@
 package by.sivko.miningrigservice.models;
 
+import by.sivko.miningrigservice.models.user.User;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -9,6 +11,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "rigs")
+@NamedQueries({
+        @NamedQuery(name = "Rig.getAllRigsByUserId", query = "SELECT r FROM Rig r WHERE r.user=:user_value")
+})
 public class Rig implements Serializable{
 
     private static final long serialVersionUID = 1227933851518935604L;
@@ -30,8 +35,9 @@ public class Rig implements Serializable{
     @Transient
     private String status;
 
-    @Column(name = "user")
-    private String user;
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private User user;
 
     @Transient
     private List<VideoCard> videoCardList;
@@ -40,7 +46,8 @@ public class Rig implements Serializable{
     public Rig() {
     }
 
-    public Rig(String name, String password){
+    public Rig(User user, String name, String password){
+        this.user = user;
         this.name = name;
         this.password = password;
     }
@@ -58,7 +65,7 @@ public class Rig implements Serializable{
         return status;
     }
 
-    public String getUser() {
+    public User getUser() {
         return user;
     }
 
