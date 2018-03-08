@@ -1,6 +1,7 @@
 package by.sivko.miningrigservice.models;
 
 import by.sivko.miningrigservice.models.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,6 +33,7 @@ public class Rig implements Serializable {
     @Transient
     private String status;
 
+    @JsonIgnore
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
@@ -92,5 +94,9 @@ public class Rig implements Serializable {
 
     public void setVideoCardList(List<VideoCard> videoCardList) {
         this.videoCardList = videoCardList;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

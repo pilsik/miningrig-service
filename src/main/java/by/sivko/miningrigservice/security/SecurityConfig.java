@@ -12,13 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
 
     @Autowired
     private MyUserDetailsService userDetailsService;
@@ -36,22 +34,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
     }
 
-    @Override
+   /* @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.
                 authorizeRequests()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/registration").permitAll()
-                .antMatchers("/admin/**").hasAuthority("ADMIN").anyRequest()
-                .authenticated().and().csrf().disable().formLogin()
-                .loginPage("/login").failureUrl("/login?error=true")
-                .defaultSuccessUrl("/rigs")
-                .usernameParameter("login")
-                .passwordParameter("password")
-                .and().logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/").and().exceptionHandling()
-                .accessDeniedPage("/access-denied");
+                .antMatchers("/admin*/
+
+    /**
+     * ").hasAuthority("ADMIN")
+     * .anyRequest().authenticated()
+     * .and().csrf().disable().formLogin()
+     * .loginPage("/login").failureUrl("/login?error=true")
+     * .defaultSuccessUrl("/rigs")
+     * .usernameParameter("login")
+     * .passwordParameter("password")
+     * .and().logout()
+     * .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+     * .logoutSuccessUrl("/").and().exceptionHandling()
+     * .accessDeniedPage("/access-denied");
+     * }
+     */
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable();
     }
 
     @Bean
