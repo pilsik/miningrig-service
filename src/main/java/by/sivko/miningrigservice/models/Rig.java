@@ -99,4 +99,24 @@ public class Rig implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Rig rig = (Rig) o;
+
+        if (!name.equals(rig.name)) return false;
+        if (!password.equals(rig.password)) return false;
+        return user.equals(rig.user);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + password.hashCode();
+        result = 31 * result + user.hashCode();
+        return result;
+    }
 }

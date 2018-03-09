@@ -22,7 +22,15 @@ public class ExceptionHandlerAdvice {
         response.setErrors(ValidationUtil.fromBindingErrors(result));
         response.setHttpStatus(HttpStatus.CONFLICT);
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 
+    @ExceptionHandler(value = {AlreadyExistsException.class, NotExistException.class, PasswordException.class})
+    @ResponseBody
+    public ResponseEntity<ExceptionResponse> handle(RuntimeException exception) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setErrorMessage(exception.getMessage());
+        response.setHttpStatus(HttpStatus.CONFLICT);
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
 }

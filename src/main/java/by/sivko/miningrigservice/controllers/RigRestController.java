@@ -1,5 +1,6 @@
 package by.sivko.miningrigservice.controllers;
 
+import by.sivko.miningrigservice.controllers.exceptions.AlreadyExistsException;
 import by.sivko.miningrigservice.dto.RigDto;
 import by.sivko.miningrigservice.models.Rig;
 import by.sivko.miningrigservice.models.user.User;
@@ -57,8 +58,7 @@ public class RigRestController {
         String username = principal.getName();
         User user = userService.findUserByUsername(username);
         if (checkExistRigByName(user.getUserRigSet(), rigDto.getName())) {
-            System.out.println(String.format("A rig with name %s already exist", rigDto.getName()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            throw new AlreadyExistsException(String.format("A rig with name [%s] already exist", rigDto.getName()));
         } else {
             Rig newRig = new Rig(user, rigDto.getName(), rigDto.getPassword());
             rigService.addRig(newRig);
