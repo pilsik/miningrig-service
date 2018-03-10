@@ -61,16 +61,16 @@ public class UserRestController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity<List<User>> getAllUsers(@PathVariable String username) {
+    public ResponseEntity<List<User>> getAllUsers() {
         List<User> userList = userService.getAllUsers();
         if (userList.isEmpty()) {
-            throw new NotExistException(String.format("Don't exist any user", username));
+            throw new NotExistException(String.format("Don't exist any user"));
         } else {
             return new ResponseEntity<>(userList, HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "/users/{username]", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
     public ResponseEntity<User> getUser(@PathVariable String username) {
         User user = userService.findUserByUsername(username);
         if (user == null) {

@@ -1,5 +1,6 @@
 package by.sivko.miningrigservice.models;
 
+import by.sivko.miningrigservice.models.miner.VideoCard;
 import by.sivko.miningrigservice.models.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,19 +28,13 @@ public class Rig implements Serializable {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Transient
-    private String miner;
-
-    @Transient
-    private String status;
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "rig", cascade = CascadeType.ALL)
+    private Status status;
 
     @JsonIgnore
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
-
-    @Transient
-    private List<VideoCard> videoCardList;
 
     //constructors
     public Rig() {
@@ -64,11 +59,7 @@ public class Rig implements Serializable {
         return password;
     }
 
-    public String getMiner() {
-        return miner;
-    }
-
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -76,24 +67,12 @@ public class Rig implements Serializable {
         return user;
     }
 
-    public List<VideoCard> getVideoCardList() {
-        return videoCardList;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setMiner(String miner) {
-        this.miner = miner;
-    }
-
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public void setVideoCardList(List<VideoCard> videoCardList) {
-        this.videoCardList = videoCardList;
     }
 
     public void setPassword(String password) {

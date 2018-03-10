@@ -21,10 +21,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @TestPropertySource("classpath:application-test.properties")
 @RunWith(SpringRunner.class)
@@ -49,6 +54,9 @@ public class UserRestControllerTest {
     private static final String USER_EMAIL = "USER_EMAIL";
     private static final String NEW_REQUEST_PARAM_PASSWORD_VALUE = "NEW_REQUEST_PARAM_PASSWORD_VALUE";
     private static final String PASSWORD_LESS_FIVE_LETTERS = "five";
+    private static final String PATH_GET_USERS = "/users";
+    private static final String PATH_GET_USER_USERNAME = PATH_GET_USERS+"/"+USER_NAME;
+    private static final String PATH_GET_WRONG_USER_USERNAME = PATH_GET_USERS+"/"+WRONG_USER_NAME;
 
 
     @Mock
@@ -66,13 +74,11 @@ public class UserRestControllerTest {
 
     MockMvc mockMvc;
 
-    User userReturnMock;
-
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        userReturnMock = new User("user", "user", "user");
+        User userReturnMock = new User("user", "user", "user");
         User userReturnMock2 = new User("user2", "user2", "user2");
         Mockito
                 .when(userService.saveUser(Mockito.any(User.class)))
@@ -89,6 +95,8 @@ public class UserRestControllerTest {
         Mockito
                 .when(principal.getName())
                 .thenReturn(USER_NAME);
+        Mockito.when(userService.getAllUsers())
+                .thenReturn(new ArrayList<User>(Arrays.asList(userReturnMock, userReturnMock2)));
     }
 
     @Test
@@ -144,12 +152,30 @@ public class UserRestControllerTest {
 
     @Test
     public void getAllUsers() throws Exception {
-
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_GET_USERS))
+                .andExpect(MockMvcResultMatchers.status().is(SUCCESSES_STATUS))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].username", is("user")))
+                .andExpect(jsonPath("$[1].username", is("user2")));
+        verify(userService, times(1)).getAllUsers();
+        verifyNoMoreInteractions(userService);
     }
 
     @Test
     public void getUser() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_GET_USER_USERNAME))
+                .andExpect(MockMvcResultMatchers.status().is(SUCCESSES_STATUS))
+                .andExpect(jsonPath("$.username", is(REQUEST_PARAM_USERNAME_VALUE)));
+        verify(userService, times(1)).findUserByUsername(USER_NAME);
+        verifyNoMoreInteractions(userService);
+    }
 
+    @Test
+    public void getNotExistsUser() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_GET_WRONG_USER_USERNAME))
+                .andExpect(MockMvcResultMatchers.status().is(RESPONSE_CONFLICT_BAD_STATUS));
+        verify(userService, times(1)).findUserByUsername(WRONG_USER_NAME);
+        verifyNoMoreInteractions(userService);
     }
 
 }

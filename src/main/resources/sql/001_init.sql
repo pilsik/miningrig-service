@@ -4,6 +4,9 @@ BEGIN TRANSACTION;
   DROP TABLE IF EXISTS "users" CASCADE;
   DROP TABLE IF EXISTS "user_profiles" CASCADE;
   DROP TABLE IF EXISTS "user_and_profile" CASCADE;
+  DROP TABLE IF EXISTS "status" CASCADE;
+  DROP TABLE IF EXISTS "video_cards" CASCADE;
+  DROP TABLE IF EXISTS "miners" CASCADE;
 
   DROP SEQUENCE IF EXISTS "rig_seq" CASCADE;
   DROP SEQUENCE IF EXISTS "user_seq" CASCADE;
@@ -17,7 +20,8 @@ BEGIN TRANSACTION;
     "id"   BIGINT PRIMARY KEY DEFAULT "nextval"('"rig_seq"'),
     "name" VARCHAR(100) NOT NULL,
     "user_id" BIGINT NOT NULL,
-    "password" VARCHAR(100) NOT NULL
+    "password" VARCHAR(100) NOT NULL,
+    "realParamNames" VARCHAR(100)
   );
 
   CREATE TABLE "users" (
@@ -44,5 +48,48 @@ BEGIN TRANSACTION;
     FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY ("profile_id") REFERENCES "user_profiles" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
   );
+
+  CREATE TABLE "status" (
+    "id"   BIGINT PRIMARY KEY,
+    "online" BOOLEAN NOT NULL DEFAULT 'FALSE',
+    "need_reboot" BOOLEAN NOT NULL DEFAULT 'FALSE',
+    "miner_id" BIGINT,
+    "rig_id" BIGINT NOT NULL,
+    "key_of_param" VARCHAR(100),
+    "value_of_param" VARCHAR(100)
+  );
+
+  CREATE TABLE "video_cards" (
+    "id"   BIGINT PRIMARY KEY,
+    "status_id" BIGINT NOT NULL,
+    "name" VARCHAR(100) NOT NULL,
+    "temperature" INTEGER,
+    "power" INTEGER,
+    "memory" INTEGER
+  );
+
+  CREATE TABLE "miners" (
+    "id"   BIGINT PRIMARY KEY,
+    "path_to_exe_file" VARCHAR(100) NOT NULL,
+    "default_command_line_with_parameters" VARCHAR(100) NOT NULL,
+    "version" VARCHAR(100) NOT NULL,
+    "date_realise" VARCHAR(100) NOT NULL,
+    "key_of_param" VARCHAR(100) NOT NULL,
+    "value_of_param" VARCHAR(100) NOT NULL
+  );
+
+  CREATE TABLE "miner_param_names" (
+    "miner_id"   BIGINT,
+    "key_of_param" VARCHAR(100) NOT NULL,
+    "value_of_param" VARCHAR(100) NOT NULL
+  );
+
+CREATE SEQUENCE "hibernate_sequence";
+  CREATE TABLE "status_real_param_names" (
+    "status_id"   BIGINT,
+    "key_of_param" VARCHAR(100) NOT NULL,
+    "value_of_param" VARCHAR(100) NOT NULL
+  );
+
 
 END TRANSACTION;
