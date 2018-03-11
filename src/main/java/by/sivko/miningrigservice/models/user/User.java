@@ -1,6 +1,6 @@
 package by.sivko.miningrigservice.models.user;
 
-import by.sivko.miningrigservice.models.Rig;
+import by.sivko.miningrigservice.models.rigs.Rig;
 
 import javax.persistence.*;
 import java.util.HashSet;

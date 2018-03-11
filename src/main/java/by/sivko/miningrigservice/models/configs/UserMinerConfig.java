@@ -1,5 +1,6 @@
-package by.sivko.miningrigservice.models.miner;
+package by.sivko.miningrigservice.models.configs;
 
+import by.sivko.miningrigservice.models.miners.Miner;
 import by.sivko.miningrigservice.models.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,7 +24,7 @@ public class UserMinerConfig implements Serializable {
     private User user;
 
     @JsonIgnore
-    @JoinColumn(nullable = false)
+    @JoinColumn
     @OneToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private Miner miner;
 

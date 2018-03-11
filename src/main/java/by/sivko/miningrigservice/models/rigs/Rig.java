@@ -1,13 +1,12 @@
-package by.sivko.miningrigservice.models;
+package by.sivko.miningrigservice.models.rigs;
 
-import by.sivko.miningrigservice.models.miner.UserMinerConfig;
-import by.sivko.miningrigservice.models.miner.VideoCard;
+import by.sivko.miningrigservice.models.status.Status;
+import by.sivko.miningrigservice.models.configs.UserMinerConfig;
 import by.sivko.miningrigservice.models.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * class Rig

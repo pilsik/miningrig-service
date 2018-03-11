@@ -1,6 +1,7 @@
-package by.sivko.miningrigservice.models;
+package by.sivko.miningrigservice.models.status;
 
-import by.sivko.miningrigservice.models.miner.VideoCard;
+import by.sivko.miningrigservice.models.rigs.Rig;
+import by.sivko.miningrigservice.models.videocards.VideoCard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;

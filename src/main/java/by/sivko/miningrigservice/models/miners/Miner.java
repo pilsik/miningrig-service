@@ -1,9 +1,6 @@
-package by.sivko.miningrigservice.models.miner;
+package by.sivko.miningrigservice.models.miners;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Entity
 @Table(name = "miners")

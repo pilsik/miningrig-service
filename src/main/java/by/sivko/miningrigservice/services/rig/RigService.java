@@ -1,9 +1,6 @@
 package by.sivko.miningrigservice.services.rig;
 
-import by.sivko.miningrigservice.models.Rig;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import by.sivko.miningrigservice.models.rigs.Rig;
 
 public interface RigService {
 

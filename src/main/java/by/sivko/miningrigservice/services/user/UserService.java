@@ -1,6 +1,6 @@
 package by.sivko.miningrigservice.services.user;
 
-import by.sivko.miningrigservice.models.Rig;
+import by.sivko.miningrigservice.models.rigs.Rig;
 import by.sivko.miningrigservice.models.user.User;
 
 import java.util.List;

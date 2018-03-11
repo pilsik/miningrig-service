@@ -2,7 +2,7 @@ package by.sivko.miningrigservice.controllers;
 
 import by.sivko.miningrigservice.controllers.exceptions.AlreadyExistsException;
 import by.sivko.miningrigservice.dto.RigDto;
-import by.sivko.miningrigservice.models.Rig;
+import by.sivko.miningrigservice.models.rigs.Rig;
 import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.services.rig.RigService;
 import by.sivko.miningrigservice.services.user.UserService;

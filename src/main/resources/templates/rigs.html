@@ -31,7 +31,7 @@
             </tr>
             </thead>
             <!--/*@thymesVar id="rigs" type="java.util.Set<Rig>"*/-->
-            <!--/*@thymesVar id="rig" type="by.sivko.miningrigservice.models.Rig"*/-->
+            <!--/*@thymesVar id="rig" type="by.sivko.miningrigservice.models.rigs.Rig"*/-->
             <tr th:each="rig : ${rigs}">
                 <td th:text="${rig.id}"></td>
                 <td th:text="${rig.name}"></td>

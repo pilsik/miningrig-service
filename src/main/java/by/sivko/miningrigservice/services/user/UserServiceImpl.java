@@ -2,7 +2,7 @@ package by.sivko.miningrigservice.services.user;
 
 import by.sivko.miningrigservice.dao.user.UserProfileRepository;
 import by.sivko.miningrigservice.dao.user.UserRepository;
-import by.sivko.miningrigservice.models.Rig;
+import by.sivko.miningrigservice.models.rigs.Rig;
 import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.models.user.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
