@@ -11,7 +11,7 @@ public abstract class Miner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    protected Long id;
 
     @Column(name = "path_to_exe_file")
     protected final String PATH_TO_EXE_FILE;
@@ -25,14 +25,8 @@ public abstract class Miner {
     @Column
     protected String dateRealise;
 
-    @ElementCollection(targetClass=String.class)
-    @MapKeyColumn(name="key_of_param")
-    @Column(name="value_of_param")
-    protected Map<String, String> paramNames;
-
     public Miner(String PATH_TO_EXE_FILE) {
         this.PATH_TO_EXE_FILE = PATH_TO_EXE_FILE;
-        this.paramNames = new LinkedHashMap<>(0);
     }
 
     public String getPATH_TO_EXE_FILE() {
@@ -49,9 +43,5 @@ public abstract class Miner {
 
     public String getDateRealise() {
         return dateRealise;
-    }
-
-    public Map<String, String> getParamNames() {
-        return paramNames;
     }
 }

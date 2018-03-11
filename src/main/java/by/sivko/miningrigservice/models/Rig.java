@@ -1,5 +1,6 @@
 package by.sivko.miningrigservice.models;
 
+import by.sivko.miningrigservice.models.miner.UserMinerConfig;
 import by.sivko.miningrigservice.models.miner.VideoCard;
 import by.sivko.miningrigservice.models.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,6 +36,10 @@ public class Rig implements Serializable {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
+
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn
+    private UserMinerConfig userMinerConfig;
 
     //constructors
     public Rig() {
@@ -77,6 +82,14 @@ public class Rig implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public UserMinerConfig getUserMinerConfig() {
+        return userMinerConfig;
+    }
+
+    public void setUserMinerConfig(UserMinerConfig userMinerConfig) {
+        this.userMinerConfig = userMinerConfig;
     }
 
     @Override

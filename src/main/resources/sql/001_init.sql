@@ -7,6 +7,7 @@ BEGIN TRANSACTION;
   DROP TABLE IF EXISTS "status" CASCADE;
   DROP TABLE IF EXISTS "video_cards" CASCADE;
   DROP TABLE IF EXISTS "miners" CASCADE;
+  DROP TABLE IF EXISTS "user_miner_configs" CASCADE;
 
   DROP SEQUENCE IF EXISTS "rig_seq" CASCADE;
   DROP SEQUENCE IF EXISTS "user_seq" CASCADE;
@@ -20,6 +21,7 @@ BEGIN TRANSACTION;
     "id"   BIGINT PRIMARY KEY DEFAULT "nextval"('"rig_seq"'),
     "name" VARCHAR(100) NOT NULL,
     "user_id" BIGINT NOT NULL,
+    "user_miner_config_id" BIGINT NOT NULL,
     "password" VARCHAR(100) NOT NULL,
     "realParamNames" VARCHAR(100)
   );
@@ -73,23 +75,15 @@ BEGIN TRANSACTION;
     "path_to_exe_file" VARCHAR(100) NOT NULL,
     "default_command_line_with_parameters" VARCHAR(100) NOT NULL,
     "version" VARCHAR(100) NOT NULL,
-    "date_realise" VARCHAR(100) NOT NULL,
-    "key_of_param" VARCHAR(100) NOT NULL,
-    "value_of_param" VARCHAR(100) NOT NULL
+    "date_realise" VARCHAR(100) NOT NULL
   );
 
-  CREATE TABLE "miner_param_names" (
-    "miner_id"   BIGINT,
-    "key_of_param" VARCHAR(100) NOT NULL,
-    "value_of_param" VARCHAR(100) NOT NULL
-  );
-
-CREATE SEQUENCE "hibernate_sequence";
-  CREATE TABLE "status_real_param_names" (
-    "status_id"   BIGINT,
-    "key_of_param" VARCHAR(100) NOT NULL,
-    "value_of_param" VARCHAR(100) NOT NULL
-  );
-
+  CREATE TABLE "user_miner_configs" (
+  "id"   BIGINT PRIMARY KEY,
+  "user_id" BIGINT NOT NULL,
+  "miner_id" BIGINT NOT NULL,
+  "name" VARCHAR(100) NOT NULL,
+  "command_line" VARCHAR(100) NOT NULL
+);
 
 END TRANSACTION;
