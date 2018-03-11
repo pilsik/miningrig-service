@@ -7,7 +7,7 @@ import java.lang.reflect.ParameterizedType;
 
 public class GenericDaoImpl<T, PK extends Serializable> implements GenericDao<T,PK> {
 
-    protected Class<T> entityClass;
+    private Class<T> entityClass;
 
     @PersistenceContext
     protected EntityManager entityManager;

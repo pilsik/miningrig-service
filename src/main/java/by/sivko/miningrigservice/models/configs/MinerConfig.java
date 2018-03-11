@@ -8,18 +8,19 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "user_miner_configs")
-public class UserMinerConfig implements Serializable {
+@Table(name = "miner_configs")
+public class MinerConfig implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "miner_config_gen")
+    @SequenceGenerator(name = "miner_config_gen", sequenceName = "miner_config_seq")
     private Long id;
 
     @Column
     private String name;
 
     @JsonIgnore
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
 
@@ -31,15 +32,15 @@ public class UserMinerConfig implements Serializable {
     @Column
     private String commandLine;
 
-    public UserMinerConfig() {
+    public MinerConfig() {
     }
 
-    public UserMinerConfig(String name, User user) {
+    public MinerConfig(String name, User user) {
         this.name = name;
         this.user = user;
     }
 
-    public UserMinerConfig(String name, User user, Miner miner) {
+    public MinerConfig(String name, User user, Miner miner) {
         this.name = name;
         this.user = user;
         this.miner = miner;
@@ -71,4 +72,16 @@ public class UserMinerConfig implements Serializable {
         return miner;
     }
 
+    public void setCommandLine(String commandLine) {
+        this.commandLine = commandLine;
+    }
+
+    public Long getId() {
+
+        return id;
+    }
+
+    public String getCommandLine() {
+        return commandLine;
+    }
 }

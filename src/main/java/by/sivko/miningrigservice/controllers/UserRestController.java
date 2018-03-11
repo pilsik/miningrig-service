@@ -6,22 +6,15 @@ import by.sivko.miningrigservice.controllers.exceptions.PasswordException;
 import by.sivko.miningrigservice.dto.UserDto;
 import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.services.user.UserService;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.security.Principal;
 import java.util.List;
 
@@ -30,23 +23,25 @@ public class UserRestController {
 
     private static final int MIN_PASSWORD_LENGTH = 5;
 
+    private final UserService userService;
+
     @Autowired
-    UserService userService;
+    public UserRestController(UserService userService) {
+        this.userService = userService;
+    }
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     public ResponseEntity<String> createUser(@Valid UserDto userDto) {
         User user = new User(userDto.getUsername(), userDto.getPassword(), userDto.getEmail());
-        User userExistsLogin = userService.findUserByUsername(user.getUsername());
+        User userExistsLogin = this.userService.findUserByUsername(user.getUsername());
         if (userExistsLogin != null) {
             throw new AlreadyExistsException("A user with this name already exists");
-            //return new ResponseEntity<>("A user with this name already exists", HttpStatus.CONFLICT);
         }
-        User userExistsEmail = userService.findUserByUsername(user.getEmail());
+        User userExistsEmail = this.userService.findUserByUsername(user.getEmail());
         if (userExistsEmail != null) {
             throw new AlreadyExistsException("A user with this email already exists");
-            //return new ResponseEntity<>("A user with this email already exists", HttpStatus.CONFLICT);
         }
-        userService.saveUser(user);
+        this.userService.saveUser(user);
         return new ResponseEntity<>("User has been registered successfully", HttpStatus.CREATED);
     }
 
@@ -57,14 +52,14 @@ public class UserRestController {
         }
         User user = this.userService.findUserByUsername(principal.getName());
         this.userService.changeUserPassword(user, password);
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> userList = userService.getAllUsers();
+        List<User> userList = this.userService.getAllUsers();
         if (userList.isEmpty()) {
-            throw new NotExistException(String.format("Don't exist any user"));
+            throw new NotExistException("Don't exist any user");
         } else {
             return new ResponseEntity<>(userList, HttpStatus.OK);
         }
@@ -72,7 +67,7 @@ public class UserRestController {
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
     public ResponseEntity<User> getUser(@PathVariable String username) {
-        User user = userService.findUserByUsername(username);
+        User user = this.userService.findUserByUsername(username);
         if (user == null) {
             throw new NotExistException(String.format("User with name [%s] not exists", username));
         } else {
@@ -80,20 +75,4 @@ public class UserRestController {
         }
     }
 
-    /*
-   @RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
-    public ModelAndView login() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("login");
-        return modelAndView;
-    }
-
-    @RequestMapping(value = {"/register"}, method = RequestMethod.GET)
-    public ModelAndView register() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("user", new UserDto());
-        modelAndView.setViewName("registration");
-        return modelAndView;
-    }
-    */
 }

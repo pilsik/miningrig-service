@@ -6,12 +6,14 @@ import by.sivko.miningrigservice.models.rigs.Rig;
 import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.services.rig.RigService;
 import by.sivko.miningrigservice.services.user.UserService;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
@@ -21,23 +23,18 @@ import java.util.Set;
 @RequestMapping(value = "/rigs")
 public class RigRestController {
 
-    private static Logger logger = Logger.getLogger(RigRestController.class);
+    private final RigService rigService;
+
+    private final UserService userService;
 
     @Autowired
-    private RigService rigService;
+    public RigRestController(RigService rigService, UserService userService) {
+        this.rigService = rigService;
+        this.userService = userService;
+    }
 
-    @Autowired
-    private UserService userService;
-
-    /**
-     * Retrieve all rigs of user
-     *
-     * @param principal
-     * @return rigs
-     */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Set<Rig>> getRigsOfUser(Principal principal) {
-        logger.info(String.format("User with name [%s] view rigs", principal.getName()));
         Set<Rig> rigSet = userService.getUserRigsByUsername(principal.getName());
         if (rigSet.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -45,14 +42,6 @@ public class RigRestController {
         return new ResponseEntity<>(userService.getUserRigsByUsername(principal.getName()), HttpStatus.OK);
     }
 
-    /**
-     * Create new rig
-     *
-     * @param rigDto
-     * @param principal
-     * @param ucBuilder
-     * @return
-     */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> createRig(RigDto rigDto, Principal principal, UriComponentsBuilder ucBuilder) {
         String username = principal.getName();
@@ -60,7 +49,7 @@ public class RigRestController {
         if (checkExistRigByName(user.getUserRigSet(), rigDto.getName())) {
             throw new AlreadyExistsException(String.format("A rig with name [%s] already exist", rigDto.getName()));
         } else {
-            Rig newRig = new Rig(user, rigDto.getName(), rigDto.getPassword());
+            Rig newRig = new Rig(rigDto.getName(), rigDto.getPassword(), user);
             rigService.addRig(newRig);
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(ucBuilder.path("/rigs").buildAndExpand().toUri());
@@ -80,13 +69,6 @@ public class RigRestController {
         return isExist;
     }
 
-    /**
-     * Retrieve rig
-     *
-     * @param id
-     * @param principal
-     * @return
-     */
     @RequestMapping(value = "/rig/{id}", method = RequestMethod.GET)
     public ResponseEntity<Rig> getRig(@PathVariable long id, Principal principal) {
         if (checkUserOwnerRig(principal.getName(), id)) {
@@ -97,14 +79,6 @@ public class RigRestController {
         }
     }
 
-    /**
-     * Delete rig
-     *
-     * @param id
-     * @param principal
-     * @param ucBuilder
-     * @return
-     */
     @RequestMapping(value = "/rig/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Rig> removeRig(@PathVariable long id, Principal principal, UriComponentsBuilder ucBuilder) {
         if (checkUserOwnerRig(principal.getName(), id)) {

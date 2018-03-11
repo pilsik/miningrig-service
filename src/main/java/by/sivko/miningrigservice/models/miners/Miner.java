@@ -7,23 +7,31 @@ import javax.persistence.*;
 public abstract class Miner {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "miner_gen")
+    @SequenceGenerator(name = "miner_gen", sequenceName = "miner_seq")
     protected Long id;
 
+    @Column
+    private String name;
+
     @Column(name = "path_to_exe_file")
-    protected final String PATH_TO_EXE_FILE;
+    private final String PATH_TO_EXE_FILE;
 
     @Column
-    protected String defaultCommandLineWithParameters;
+    private String defaultCommandLineWithParameters;
 
     @Column
-    protected String version;
+    private String version;
 
     @Column
-    protected String dateRealise;
+    private String dateRealise;
 
-    public Miner(String PATH_TO_EXE_FILE) {
+    public Miner(String name, String PATH_TO_EXE_FILE, String defaultCommandLineWithParameters, String version, String dateRealise) {
+        this.name = name;
         this.PATH_TO_EXE_FILE = PATH_TO_EXE_FILE;
+        this.defaultCommandLineWithParameters = defaultCommandLineWithParameters;
+        this.version = version;
+        this.dateRealise = dateRealise;
     }
 
     public String getPATH_TO_EXE_FILE() {
@@ -40,5 +48,9 @@ public abstract class Miner {
 
     public String getDateRealise() {
         return dateRealise;
+    }
+
+    public String getName() {
+        return name;
     }
 }

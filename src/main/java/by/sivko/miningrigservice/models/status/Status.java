@@ -13,7 +13,8 @@ import java.util.List;
 public class Status implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "status_gen")
+    @SequenceGenerator(name = "status_gen", sequenceName = "status_seq")
     private Long id;
 
     @JsonIgnore

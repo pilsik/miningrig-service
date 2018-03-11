@@ -13,7 +13,8 @@ import javax.persistence.*;
 public abstract class VideoCard {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "video_card_gen")
+    @SequenceGenerator(name = "video_card_gen", sequenceName = "video_card_seq")
     private Long id;
 
     @JsonIgnore

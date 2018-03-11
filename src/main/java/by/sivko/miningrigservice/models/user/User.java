@@ -1,5 +1,6 @@
 package by.sivko.miningrigservice.models.user;
 
+import by.sivko.miningrigservice.models.configs.MinerConfig;
 import by.sivko.miningrigservice.models.rigs.Rig;
 
 import javax.persistence.*;
@@ -45,6 +46,8 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Rig> userRigSet = new HashSet<>(0);
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<MinerConfig> minerConfigs = new HashSet<>(0);
 
     public User() {
     }
@@ -101,6 +104,14 @@ public class User {
 
     public void setUserRigSet(Set<Rig> userRigSet) {
         this.userRigSet = userRigSet;
+    }
+
+    public Set<MinerConfig> getMinerConfigs() {
+        return minerConfigs;
+    }
+
+    public void setMinerConfigs(Set<MinerConfig> minerConfigs) {
+        this.minerConfigs = minerConfigs;
     }
 
     public void setEnabled(boolean enabled) {

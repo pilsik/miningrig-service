@@ -1,7 +1,7 @@
 package by.sivko.miningrigservice.models.rigs;
 
 import by.sivko.miningrigservice.models.status.Status;
-import by.sivko.miningrigservice.models.configs.UserMinerConfig;
+import by.sivko.miningrigservice.models.configs.MinerConfig;
 import by.sivko.miningrigservice.models.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -14,8 +14,6 @@ import java.io.Serializable;
 @Entity
 @Table(name = "rigs")
 public class Rig implements Serializable {
-
-    private static final long serialVersionUID = 1227933851518935604L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rig_gen")
@@ -38,13 +36,13 @@ public class Rig implements Serializable {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn
-    private UserMinerConfig userMinerConfig;
+    private MinerConfig minerConfig;
 
     //constructors
     public Rig() {
     }
 
-    public Rig(User user, String name, String password) {
+    public Rig(String name, String password, User user) {
         this.user = user;
         this.name = name;
         this.password = password;
@@ -83,12 +81,12 @@ public class Rig implements Serializable {
         this.password = password;
     }
 
-    public UserMinerConfig getUserMinerConfig() {
-        return userMinerConfig;
+    public MinerConfig getMinerConfig() {
+        return minerConfig;
     }
 
-    public void setUserMinerConfig(UserMinerConfig userMinerConfig) {
-        this.userMinerConfig = userMinerConfig;
+    public void setMinerConfig(MinerConfig minerConfig) {
+        this.minerConfig = minerConfig;
     }
 
     @Override

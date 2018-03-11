@@ -2,6 +2,7 @@ package by.sivko.miningrigservice.services.user;
 
 import by.sivko.miningrigservice.dao.user.UserProfileRepository;
 import by.sivko.miningrigservice.dao.user.UserRepository;
+import by.sivko.miningrigservice.models.configs.MinerConfig;
 import by.sivko.miningrigservice.models.rigs.Rig;
 import by.sivko.miningrigservice.models.user.User;
 import by.sivko.miningrigservice.models.user.UserProfile;
@@ -10,23 +11,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final UserProfileRepository userProfileRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    UserProfileRepository userProfileRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserRepository userRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public User findUserByUsername(String username) {
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     public User saveUser(User user) {
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         UserProfile userRole = this.userProfileRepository.findByType("ROLE_USER");
-        user.setUserProfiles(new HashSet<UserProfile>(Arrays.asList(userRole)));
+        user.setUserProfiles(new HashSet<>(Collections.singletonList(userRole)));
         this.userRepository.save(user);
         return user;
     }
@@ -61,5 +63,11 @@ public class UserServiceImpl implements UserService {
     public void changeUserPassword(User user, String password) {
         user.setPassword(this.passwordEncoder.encode(password));
         this.userRepository.save(user);
+    }
+
+    @Override
+    public Set<MinerConfig> getUserMinerConfigsByUsername(String username) {
+        User user = this.findUserByUsername(username);
+        return user.getMinerConfigs();
     }
 }

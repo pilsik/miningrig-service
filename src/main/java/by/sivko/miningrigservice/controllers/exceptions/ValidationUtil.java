@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract class ValidationUtil {
+abstract class ValidationUtil {
 
-    public static List<String> fromBindingErrors(Errors errors) {
+    static List<String> fromBindingErrors(Errors errors) {
         List<String> validErrors = new ArrayList<>();
         for (ObjectError objectError : errors.getAllErrors()) {
             validErrors.add(objectError.getDefaultMessage());

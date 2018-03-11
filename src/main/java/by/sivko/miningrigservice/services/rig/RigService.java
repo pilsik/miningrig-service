@@ -4,8 +4,8 @@ import by.sivko.miningrigservice.models.rigs.Rig;
 
 public interface RigService {
 
-    Rig addRig(Rig rig);
+    void addRig(Rig rig);
     Rig getRigById(Long id);
-    Rig removeRigById(Long id);
+    void removeRigById(Long id);
 
 }
