@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -34,19 +35,19 @@ public class RigRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<Set<Rig>> getRigsOfUser(Principal principal) {
-        Set<Rig> rigSet = userService.getUserRigsByUsername(principal.getName());
-        if (rigSet.isEmpty()) {
+    public ResponseEntity<List<Rig>> getRigsOfUser(Principal principal) {
+        List<Rig> rigList = userService.getUserRigsByUsername(principal.getName());
+        if (rigList.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(userService.getUserRigsByUsername(principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(rigList, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> createRig(RigDto rigDto, Principal principal, UriComponentsBuilder ucBuilder) {
         String username = principal.getName();
         User user = userService.findUserByUsername(username);
-        if (checkExistRigByName(user.getUserRigSet(), rigDto.getName())) {
+        if (checkExistRigByName(user.getUserRigList(), rigDto.getName())) {
             throw new AlreadyExistsException(String.format("A rig with name [%s] already exist", rigDto.getName()));
         } else {
             Rig newRig = new Rig(rigDto.getName(), rigDto.getPassword(), user);
@@ -58,9 +59,9 @@ public class RigRestController {
         }
     }
 
-    private boolean checkExistRigByName(Set<Rig> rigSet, String rigName) {
+    private boolean checkExistRigByName(List<Rig> rigList, String rigName) {
         boolean isExist = false;
-        for (Rig rig : rigSet) {
+        for (Rig rig : rigList) {
             if (rigName.equalsIgnoreCase(rig.getName())) {
                 isExist = true;
                 break;
@@ -106,7 +107,7 @@ public class RigRestController {
     private boolean checkUserOwnerRig(String username, long id) {
         boolean isUserOwnerTheRig = false;
         User user = userService.findUserByUsername(username);
-        for (Rig rig : user.getUserRigSet()) {
+        for (Rig rig : user.getUserRigList()) {
             if (rig.getId() == id) {
                 isUserOwnerTheRig = true;
                 break;

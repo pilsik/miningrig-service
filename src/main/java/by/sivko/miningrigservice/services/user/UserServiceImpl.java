@@ -50,9 +50,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<Rig> getUserRigsByUsername(String username) {
-        User user = this.findUserByUsername(username);
-        return user.getUserRigSet();
+    public List<Rig> getUserRigsByUsername(String username) {
+        return this.userRepository.findByUsername(username).getUserRigList();
     }
 
     @Override
@@ -66,8 +65,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<MinerConfig> getUserMinerConfigsByUsername(String username) {
-        User user = this.findUserByUsername(username);
-        return user.getMinerConfigs();
+    public List<MinerConfig> getUserMinerConfigsByUsername(String username) {
+        return this.userRepository.findByUsername(username).getMinerConfigs();
     }
 }

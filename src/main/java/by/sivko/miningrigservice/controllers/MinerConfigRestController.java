@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -52,7 +53,7 @@ public class MinerConfigRestController {
         }
     }
 
-    private boolean checkExistConfigByName(Set<MinerConfig> minerConfigs, String rigName) {
+    private boolean checkExistConfigByName(List<MinerConfig> minerConfigs, String rigName) {
         boolean isExist = false;
         for (MinerConfig minerConfig : minerConfigs) {
             if (rigName.equalsIgnoreCase(minerConfig.getName())) {
@@ -64,8 +65,8 @@ public class MinerConfigRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<Set<MinerConfig>> getAllUserMinerConfigs(Principal principal) {
-        Set<MinerConfig> rigSet = this.userService.getUserMinerConfigsByUsername(principal.getName());
+    public ResponseEntity<List<MinerConfig>> getAllUserMinerConfigs(Principal principal) {
+        List<MinerConfig> rigSet = this.userService.getUserMinerConfigsByUsername(principal.getName());
         if (rigSet.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }

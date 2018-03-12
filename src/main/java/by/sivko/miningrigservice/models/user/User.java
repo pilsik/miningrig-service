@@ -4,7 +4,9 @@ import by.sivko.miningrigservice.models.configs.MinerConfig;
 import by.sivko.miningrigservice.models.rigs.Rig;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -44,10 +46,10 @@ public class User {
     private Set<UserProfile> userProfiles = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Rig> userRigSet = new HashSet<>(0);
+    private List<Rig> userRigList = new ArrayList<>(0);
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<MinerConfig> minerConfigs = new HashSet<>(0);
+    private List<MinerConfig> minerConfigs = new ArrayList<>(0);
 
     public User() {
     }
@@ -102,15 +104,15 @@ public class User {
         this.credentialsNonExpired = credentialsNonExpired;
     }
 
-    public void setUserRigSet(Set<Rig> userRigSet) {
-        this.userRigSet = userRigSet;
+    public void setUserRigList(List<Rig> userRigList) {
+        this.userRigList = userRigList;
     }
 
-    public Set<MinerConfig> getMinerConfigs() {
+    public List<MinerConfig> getMinerConfigs() {
         return minerConfigs;
     }
 
-    public void setMinerConfigs(Set<MinerConfig> minerConfigs) {
+    public void setMinerConfigs(List<MinerConfig> minerConfigs) {
         this.minerConfigs = minerConfigs;
     }
 
@@ -134,11 +136,8 @@ public class User {
         return enabled;
     }
 
-    public Set<Rig> getUserRigSet() {
-        if (this.userRigSet == null) {
-            this.userRigSet = new HashSet<>(0);
-        }
-        return userRigSet;
+    public List<Rig> getUserRigList() {
+        return userRigList;
     }
 
     @Override

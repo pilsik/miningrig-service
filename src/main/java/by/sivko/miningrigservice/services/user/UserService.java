@@ -17,9 +17,9 @@ public interface UserService {
 
     User saveUser(User user);
 
-    Set<Rig> getUserRigsByUsername(String username);
+    List<Rig> getUserRigsByUsername(String username);
 
-    Set<MinerConfig> getUserMinerConfigsByUsername(String username);
+    List<MinerConfig> getUserMinerConfigsByUsername(String username);
 
     void changeUserPassword(User user, String password);
 
