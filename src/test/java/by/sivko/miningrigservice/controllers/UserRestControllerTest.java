@@ -147,6 +147,8 @@ public class UserRestControllerTest {
                 .principal(principal)
                 .param(REQUEST_PARAM_PASSWORD, PASSWORD_LESS_FIVE_LETTERS))
                 .andExpect(MockMvcResultMatchers.status().is(RESPONSE_CONFLICT_BAD_STATUS));
+        verify(principal, times(1)).getName();
+        verifyNoMoreInteractions(principal);
     }
 
     @Test

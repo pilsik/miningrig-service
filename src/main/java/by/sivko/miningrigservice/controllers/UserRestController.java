@@ -23,7 +23,7 @@ public class UserRestController {
 
     private static final int MIN_PASSWORD_LENGTH = 5;
 
-    private final UserService userService;
+    private UserService userService;
 
     @Autowired
     public UserRestController(UserService userService) {

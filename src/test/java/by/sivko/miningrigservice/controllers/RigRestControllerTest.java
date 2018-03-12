@@ -51,7 +51,7 @@ public class RigRestControllerTest {
     private static final String SECOND_USER_PASSWORD = "SECOND_USER_PASSWORD";
     private static final String SECOND_USER_EMAIL = "SECOND_USER_EMAIL";
     private static final String FIRST_RIG_NAME = "FIRST_RIG_NAME";
-    private static final String FIRST_RIG_PASSWORD;
+    private static final String FIRST_RIG_PASSWORD = "FIRST_RIG_PASSWORD";
     private static final String SECOND_RIG_NAME = "SECOND_RIG_NAME";
     private static final String SECOND_RIG_PASSWORD = "SECOND_RIG_PASSWORD";
 
@@ -60,9 +60,7 @@ public class RigRestControllerTest {
 
     private static final String PATH_RIGS_USER = "/rigs";
 
-    static {
-        FIRST_RIG_PASSWORD = "FIRST_RIG_PASSWORD";
-    }
+
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -118,17 +116,18 @@ public class RigRestControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name", is(FIRST_RIG_NAME)))
                 .andExpect(jsonPath("$[1].name", is(SECOND_RIG_NAME)));
-        verify(mockPrincipalForFirstUser, times(1)).getName();
-        verify(mockUserService, times(1)).getUserRigsByUsername(Mockito.any(String.class));
+        verify(mockPrincipalForFirstUser, times(2)).getName();
         verifyNoMoreInteractions(mockPrincipalForFirstUser);
+        verify(mockUserService, times(1)).getUserRigsByUsername(Mockito.any(String.class));
         verifyNoMoreInteractions(mockUserService);
     }
 
     @Test
     public void getRigsOfUserEmpty() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(PATH_RIGS_USER))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.CONFLICT.value()));
-        verify(mockPrincipalForSecondUser, times(1)).getName();
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_RIGS_USER)
+                .principal(mockPrincipalForSecondUser))
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NO_CONTENT.value()));
+        verify(mockPrincipalForSecondUser, times(2)).getName();
         verify(mockUserService, times(1)).getUserRigsByUsername(Mockito.any(String.class));
         verifyNoMoreInteractions(mockPrincipalForSecondUser);
         verifyNoMoreInteractions(mockUserService);

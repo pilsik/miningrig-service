@@ -5,7 +5,6 @@ import by.sivko.miningrigservice.models.rigs.Rig;
 import by.sivko.miningrigservice.models.user.User;
 
 import java.util.List;
-import java.util.Set;
 
 public interface UserService {
 

@@ -18,15 +18,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/rigs")
 public class RigRestController {
 
-    private final RigService rigService;
+    private RigService rigService;
 
-    private final UserService userService;
+    private UserService userService;
 
     @Autowired
     public RigRestController(RigService rigService, UserService userService) {
@@ -36,7 +35,7 @@ public class RigRestController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Rig>> getRigsOfUser(Principal principal) {
-        List<Rig> rigList = userService.getUserRigsByUsername(principal.getName());
+        List<Rig> rigList = this.userService.getUserRigsByUsername(principal.getName());
         if (rigList.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -106,8 +105,8 @@ public class RigRestController {
 
     private boolean checkUserOwnerRig(String username, long id) {
         boolean isUserOwnerTheRig = false;
-        User user = userService.findUserByUsername(username);
-        for (Rig rig : user.getUserRigList()) {
+        List<Rig> rigList = this.userService.getUserRigsByUsername(username);
+        for (Rig rig : rigList) {
             if (rig.getId() == id) {
                 isUserOwnerTheRig = true;
                 break;
