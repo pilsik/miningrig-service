@@ -20,17 +20,21 @@ public class RigServiceImpl implements RigService {
 
     @Override
     public void addRig(Rig rig) {
-        rigDao.save(rig);
+        this.rigDao.save(rig);
     }
 
     @Override
     public Rig getRigById(Long id) {
-        return rigDao.findOne(id);
+        return this.rigDao.findOne(id);
     }
 
     @Override
     public void removeRigById(Long id) {
-        rigDao.deleteRigById(id);
+        this.rigDao.deleteRigById(id);
     }
 
+    @Override
+    public void removeRig(Rig rig) {
+        this.rigDao.remove(rig);
+    }
 }

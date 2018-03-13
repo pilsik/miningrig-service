@@ -108,4 +108,5 @@ public class Rig implements Serializable {
         result = 31 * result + user.hashCode();
         return result;
     }
+
 }

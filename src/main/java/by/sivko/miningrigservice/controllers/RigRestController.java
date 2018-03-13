@@ -10,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
@@ -43,9 +41,9 @@ public class RigRestController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> createRig(RigDto rigDto, Principal principal, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<Void> createRig(@Valid RigDto rigDto, Principal principal, UriComponentsBuilder ucBuilder) {
         String username = principal.getName();
-        User user = userService.findUserByUsername(username);
+        User user = this.userService.findUserByUsername(username);
         if (checkExistRigByName(user.getUserRigList(), rigDto.getName())) {
             throw new AlreadyExistsException(String.format("A rig with name [%s] already exist", rigDto.getName()));
         } else {
@@ -53,7 +51,6 @@ public class RigRestController {
             rigService.addRig(newRig);
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(ucBuilder.path("/rigs").buildAndExpand().toUri());
-//            headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         }
     }
@@ -71,8 +68,9 @@ public class RigRestController {
 
     @RequestMapping(value = "/rig/{id}", method = RequestMethod.GET)
     public ResponseEntity<Rig> getRig(@PathVariable long id, Principal principal) {
-        if (checkUserOwnerRig(principal.getName(), id)) {
-            Rig rig = rigService.getRigById(id);
+        List<Rig> rigs = this.userService.getUserRigsByUsername(principal.getName());
+        Rig rig = checkUserOwnerRigAndGetRig(rigs, id);
+        if (rig != null) {
             return new ResponseEntity<>(rig, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.LOCKED);
@@ -80,38 +78,45 @@ public class RigRestController {
     }
 
     @RequestMapping(value = "/rig/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Rig> removeRig(@PathVariable long id, Principal principal, UriComponentsBuilder ucBuilder) {
-        if (checkUserOwnerRig(principal.getName(), id)) {
-            rigService.removeRigById(id);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(ucBuilder.path("/rigs").buildAndExpand().toUri());
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+    public ResponseEntity<Void> removeRig(@PathVariable long id, Principal principal) {
+        List<Rig> rigs = this.userService.getUserRigsByUsername(principal.getName());
+        Rig rig = checkUserOwnerRigAndGetRig(rigs, id);
+        if (rig != null) {
+            rigService.removeRig(rig);
+
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
     }
 
     @RequestMapping(value = "/rig/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> changeRigPassword(@PathVariable long id, String password, Principal principal) {
-        if (checkUserOwnerRig(principal.getName(), id)) {
-            Rig rig = rigService.getRigById(id);
-            rig.setPassword(password);
-            HttpHeaders headers = new HttpHeaders();
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+    public ResponseEntity<Void> changeRigPasswordOrName(@PathVariable long id, @Valid RigDto rigDto, Principal principal) {
+        List<Rig> rigs = this.userService.getUserRigsByUsername(principal.getName());
+        Rig rig = checkUserOwnerRigAndGetRig(rigs, id);
+        if (rig != null) {
+            if (rigDto.getPassword() != null && !rigDto.getPassword().isEmpty()) {
+                rig.setPassword(rigDto.getPassword());
+            }
+            if (rigDto.getName() != null && !rigDto.getName().isEmpty()) {
+                if (checkExistRigByName(rigs, rigDto.getName()))
+                    throw new AlreadyExistsException(String.format("A rig with name [%s] already exist", rigDto.getName()));
+                rig.setName(rigDto.getName());
+            }
+            this.rigService.addRig(rig);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
     }
 
-    private boolean checkUserOwnerRig(String username, long id) {
-        boolean isUserOwnerTheRig = false;
-        List<Rig> rigList = this.userService.getUserRigsByUsername(username);
+
+    private Rig checkUserOwnerRigAndGetRig(List<Rig> rigList, long id) {
         for (Rig rig : rigList) {
             if (rig.getId() == id) {
-                isUserOwnerTheRig = true;
-                break;
+                return rig;
             }
         }
-        return isUserOwnerTheRig;
+        return null;
     }
 }

@@ -10,4 +10,6 @@ public interface RigService {
 
     void removeRigById(Long id);
 
+    void removeRig(Rig rig);
+
 }

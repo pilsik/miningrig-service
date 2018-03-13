@@ -27,4 +27,10 @@ public class GenericDaoImpl<T, PK extends Serializable> implements GenericDao<T,
     public T findOne(PK id) {
         return this.entityManager.find(entityClass,id);
     }
+
+
+    @Override
+    public void remove(T t) {
+        this.entityManager.remove(t);
+    }
 }
