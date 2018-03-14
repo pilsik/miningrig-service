@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/miners")
 public class MinerRestController {
 
-    private final MinerService minerService;
+    private MinerService minerService;
 
     @Autowired
     public MinerRestController(MinerService minerService) {
