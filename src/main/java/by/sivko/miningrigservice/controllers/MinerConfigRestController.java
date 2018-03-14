@@ -41,7 +41,7 @@ public class MinerConfigRestController {
     public ResponseEntity<Void> createRig(@Valid MinerConfigDto minerConfigDto, @RequestParam(required = false) Long minerId, Principal principal) {
         String username = principal.getName();
         User user = this.userService.findUserByUsername(username);
-        if (checkExistConfigByName(user.getMinerConfigs(), minerConfigDto.getName())) {
+        if (checkExistConfigByName(user.getMinerConfigs(), minerConfigDto.getName(), 0)) {
             throw new AlreadyExistsException(String.format("A config with name [%s] already exist", minerConfigDto.getName()));
         } else {
             MinerConfig minerConfig = new MinerConfig(minerConfigDto.getName(), user);
@@ -56,10 +56,10 @@ public class MinerConfigRestController {
         }
     }
 
-    private boolean checkExistConfigByName(List<MinerConfig> minerConfigs, String rigName) {
+    private boolean checkExistConfigByName(List<MinerConfig> minerConfigs, String rigName, long id) {
         boolean isExist = false;
         for (MinerConfig minerConfig : minerConfigs) {
-            if (rigName.equalsIgnoreCase(minerConfig.getName())) {
+            if (rigName.equalsIgnoreCase(minerConfig.getName()) && minerConfig.getId() != id) {
                 isExist = true;
                 break;
             }
@@ -78,8 +78,8 @@ public class MinerConfigRestController {
 
     @RequestMapping(value = "/config/{id}", method = RequestMethod.GET)
     public ResponseEntity<MinerConfig> getMinerConfigById(@PathVariable long id, Principal principal) {
-        if (checkOwnerConfig(principal.getName(), id)) {
-            MinerConfig minerConfig = this.minerConfigService.getMinerConfigById(id);
+        MinerConfig minerConfig = checkOwnerConfig(principal.getName(), id);
+        if (minerConfig != null) {
             return new ResponseEntity<>(minerConfig, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.LOCKED);
@@ -87,39 +87,47 @@ public class MinerConfigRestController {
     }
 
     @RequestMapping(value = "/config/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> changeMinerConfig(@PathVariable long id, MinerConfigDto minerConfigDto, @RequestParam(required = false) MinerDto minerDto, Principal principal) {
-        if (checkOwnerConfig(principal.getName(), id)) {
-            MinerConfig minerConfig = this.minerConfigService.getMinerConfigById(id);
+    public ResponseEntity<Void> changeMinerConfig(@PathVariable long id, @Valid MinerConfigDto minerConfigDto, @RequestParam(required = false) Long minerId, Principal principal) {
+        String name = principal.getName();
+        MinerConfig minerConfig = checkOwnerConfig(name, id);
+        if (minerConfig != null) {
+            User user = this.userService.findUserByUsername(name);
+            if (checkExistConfigByName(user.getMinerConfigs(), minerConfigDto.getName(), id))
+                throw new AlreadyExistsException(String.format("Config with name %s already exists", minerConfig.getName()));
             minerConfig.setName(minerConfigDto.getName());
             minerConfig.setCommandLine(minerConfigDto.getCommandLine());
-            minerConfig.setMiner(this.minerService.getMinerById(minerDto.getId()));
+            if (minerId != null) {
+                Miner miner = this.minerService.getMinerById(minerId);
+                if (miner == null)
+                    throw new NotExistException(String.format("Miner with id %s NOT exists", minerId.toString()));
+                minerConfig.setMiner(miner);
+            }
             this.minerConfigService.addMinerConfig(minerConfig);
-            HttpHeaders headers = new HttpHeaders();
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
     }
 
     @RequestMapping(value = "/config/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<MinerConfig> removeUserConfig(@PathVariable long id, Principal principal) {
-        if (checkOwnerConfig(principal.getName(), id)) {
-            return new ResponseEntity<>(this.minerConfigService.removeMinerConfigById(id), HttpStatus.OK);
+    public ResponseEntity<MinerConfig> removeMinerConfig(@PathVariable long id, Principal principal) {
+        MinerConfig minerConfig = checkOwnerConfig(principal.getName(), id);
+        if (minerConfig != null) {
+            this.minerConfigService.removeMinerConfig(minerConfig);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
     }
 
-    private boolean checkOwnerConfig(String username, long id) {
-        boolean isUserOwnerTheRig = false;
+    private MinerConfig checkOwnerConfig(String username, long id) {
         User user = this.userService.findUserByUsername(username);
         for (MinerConfig minerConfig : user.getMinerConfigs()) {
             if (minerConfig.getId() == id) {
-                isUserOwnerTheRig = true;
-                break;
+                return minerConfig;
             }
         }
-        return isUserOwnerTheRig;
+        return null;
     }
 
 

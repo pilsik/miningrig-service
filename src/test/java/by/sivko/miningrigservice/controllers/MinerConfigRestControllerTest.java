@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class MinerConfigRestControllerTest {
     private static final String USER_PASSWORD = "FIRST_USER_PASSWORD";
     private static final String USER_EMAIL = "FIRST_USER_EMAIL";
     private static final String FIRST_MINER_CONFIG_NAME = "FIRST_MINER_CONFIG_NAME";
-    private static final String SECOND_MINER_CONFIG_NAME = "FIRST_MINER_CONFIG_NAME";
+    private static final String SECOND_MINER_CONFIG_NAME = "SECOND_MINER_CONFIG_NAME";
     private static final String MOCK_GET_NAME = USER_USERNAME;
     private static final String MINER_NAME = "MINER_NAME";
     private static final String MINER_PATH_TO_EXE_FILE = "MINER_PATH_TO_EXE_FILE";
@@ -60,10 +61,15 @@ public class MinerConfigRestControllerTest {
     private static final int HTTP_RESPONSE_CONFLICT_CODE = 409;
     private static final int HTTP_RESPONSE_SUCCESS_CODE = 200;
     private static final int HTTP_RESPONSE_NO_CONTENT_CODE = 204;
+    private static final int HTTP_RESPONSE_LOCKED_CODE = 423;
+
     private static final String USER_USERNAME_EMPTY_CONFIGS = "USER_USERNAME_EMPTY_CONFIGS";
     private static final String USER_PASSWORD_EMPTY_CONFIGS = "USER_PASSWORD_EMPTY_CONFIGS";
     private static final String USER_EMAIL_EMPTY_CONFIGS = "USER_EMAIL_EMPTY_CONFIGS";
     private static final String MOCK_GET_NAME_EMPTY_CONFIGS = USER_USERNAME_EMPTY_CONFIGS;
+    private static final String MINER_CONFIG_FIELD_ID = "id";
+    private static final Long FIRST_MINER_CONFIG_ID = 1L;
+    private static final Long SECOND_MINER_CONFIG_ID = 2L;
 
 
     @Autowired
@@ -98,6 +104,18 @@ public class MinerConfigRestControllerTest {
         User userWithEmptyConfigs = new User(USER_USERNAME_EMPTY_CONFIGS, USER_PASSWORD_EMPTY_CONFIGS, USER_EMAIL_EMPTY_CONFIGS);
         MinerConfig firstMinerConfig = new MinerConfig(FIRST_MINER_CONFIG_NAME, user);
         MinerConfig secondMinerConfig = new MinerConfig(SECOND_MINER_CONFIG_NAME, user);
+        try {
+            Field firstField = firstMinerConfig.getClass().getDeclaredField(MINER_CONFIG_FIELD_ID);
+            firstField.setAccessible(true);
+            firstField.set(firstMinerConfig, FIRST_MINER_CONFIG_ID);
+            Field secondField = secondMinerConfig.getClass().getDeclaredField(MINER_CONFIG_FIELD_ID);
+            secondField.setAccessible(true);
+            secondField.set(secondMinerConfig, SECOND_MINER_CONFIG_ID);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
         List<MinerConfig> userMinerConfigs = new ArrayList<>(Arrays.asList(firstMinerConfig, secondMinerConfig));
         user.setMinerConfigs(userMinerConfigs);
         Miner miner = new Miner(MINER_NAME, MINER_PATH_TO_EXE_FILE, MINER_DEFAULT_COMMAND_LINE_WITH_PARAMETERS, MINER_VERSION, MINER_DATA_REALISE) {
@@ -215,16 +233,173 @@ public class MinerConfigRestControllerTest {
         verifyNoMoreInteractions(mockUserService);
     }
 
+    private static final String PATH_GET_MINER_CONFIG_BY_ID = "/configs/config/"+FIRST_MINER_CONFIG_ID;
+
     @Test
-    public void getUserMinerConfigById() throws Exception {
+    public void getMinerConfigById() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_GET_MINER_CONFIG_BY_ID)
+                .principal(mockPrincipal))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_SUCCESS_CODE))
+                .andExpect(jsonPath("$.name", is(FIRST_MINER_CONFIG_NAME)));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(1)).findUserByUsername(Mockito.any(String.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
     }
+
+    private static final String PATH_GET_OTHERS_MINER_CONFIG_BY_ID = "/configs/config/"+REQUEST_PARAM_NOT_EXISTS_MINER_ID_VALUE.toString();
+
+    @Test
+    public void getOthersMinerConfigById() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH_GET_OTHERS_MINER_CONFIG_BY_ID)
+                .principal(mockPrincipal))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_LOCKED_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(1)).findUserByUsername(Mockito.any(String.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+    }
+
+    private static final String PATH_TO_REMOVE_MINER_CONFIG = "/configs/config/"+FIRST_MINER_CONFIG_ID;
+
+    @Test
+    public void removeMinerConfig() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(PATH_TO_REMOVE_MINER_CONFIG)
+                .principal(mockPrincipal))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_SUCCESS_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(1)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(1)).removeMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+    }
+
+    @Test
+    public void removeOtherMinerConfig() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(PATH_TO_REMOVE_MINER_CONFIG)
+                .principal(mockPrincipalWithEmptyMinerConfigs))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_LOCKED_CODE));
+        verify(mockPrincipalWithEmptyMinerConfigs, times(2)).getName();
+        verify(mockUserService, times(1)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(0)).removeMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+    }
+
+    private static final String PATH_PUT_MINER_CONFIG = "/configs/config/"+FIRST_MINER_CONFIG_ID;
 
     @Test
     public void changeMinerConfig() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipal)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, REQUEST_PARAM_MINER_CONFIG_NAME_VALUE)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_SUCCESS_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(2)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(1)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
     }
 
     @Test
-    public void removeUserConfig() throws Exception {
+    public void changeMinerConfigWithSameName() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipal)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, FIRST_MINER_CONFIG_NAME)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_SUCCESS_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(2)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(1)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
     }
 
+    @Test
+    public void changeMinerConfigWithExistName() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipal)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, SECOND_MINER_CONFIG_NAME)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_CONFLICT_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(2)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(0)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+    }
+
+    private static final String MINER_CONFIG_NAME_LESS_THREE_CHARACTERS = "a";
+
+    @Test
+    public void changeMinerConfigWithNameLessThreeCharacters() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipal)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, MINER_CONFIG_NAME_LESS_THREE_CHARACTERS)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_CONFLICT_CODE));
+        verify(mockPrincipal, times(1)).getName();
+        verify(mockUserService, times(0)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(0)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+    }
+
+    @Test
+    public void changeOthersMinerConfig() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipalWithEmptyMinerConfigs)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, REQUEST_PARAM_MINER_CONFIG_NAME_VALUE)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_LOCKED_CODE));
+        verify(mockPrincipalWithEmptyMinerConfigs, times(2)).getName();
+        verify(mockUserService, times(1)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(0)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verifyNoMoreInteractions(mockPrincipalWithEmptyMinerConfigs);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+    }
+
+    @Test
+    public void changeMinerConfigWithExistsMinerId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipal)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, REQUEST_PARAM_MINER_CONFIG_NAME_VALUE)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE)
+                .param(REQUEST_PARAM_MINER_ID, REQUEST_PARAM_EXISTS_MINER_ID_VALUE.toString()))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_SUCCESS_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(2)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(1)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verify(mockMinerService, times(1)).getMinerById(Mockito.any(Long.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+        verifyNoMoreInteractions(mockMinerService);
+    }
+
+    @Test
+    public void changeMinerConfigWithNotExistsMinerId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(PATH_PUT_MINER_CONFIG)
+                .principal(mockPrincipal)
+                .param(REQUEST_PARAM_MINER_CONFIG_NAME, REQUEST_PARAM_MINER_CONFIG_NAME_VALUE)
+                .param(REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE, REQUEST_PARAM_MINER_CONFIG_COMMAND_LINE_VALUE)
+                .param(REQUEST_PARAM_MINER_ID, REQUEST_PARAM_NOT_EXISTS_MINER_ID_VALUE.toString()))
+                .andExpect(MockMvcResultMatchers.status().is(HTTP_RESPONSE_CONFLICT_CODE));
+        verify(mockPrincipal, times(2)).getName();
+        verify(mockUserService, times(2)).findUserByUsername(Mockito.any(String.class));
+        verify(mockMinerConfigService, times(0)).addMinerConfig(Mockito.any(MinerConfig.class));
+        verify(mockMinerService, times(1)).getMinerById(Mockito.any(Long.class));
+        verifyNoMoreInteractions(mockPrincipal);
+        verifyNoMoreInteractions(mockUserService);
+        verifyNoMoreInteractions(mockMinerConfigService);
+        verifyNoMoreInteractions(mockMinerService);
+    }
 }

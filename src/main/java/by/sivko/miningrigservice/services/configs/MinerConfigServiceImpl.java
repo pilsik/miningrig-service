@@ -21,12 +21,17 @@ public class MinerConfigServiceImpl implements MinerConfigService {
     }
 
     @Override
-    public MinerConfig removeMinerConfigById(Long id) {
-        return this.minerConfigDao.deleteUserMinerConfigById(id);
+    public void removeMinerConfigById(Long id) {
+        this.minerConfigDao.deleteUserMinerConfigById(id);
     }
 
     @Override
     public void addMinerConfig(MinerConfig minerConfig) {
         this.minerConfigDao.save(minerConfig);
+    }
+
+    @Override
+    public void removeMinerConfig(MinerConfig minerConfig) {
+        this.minerConfigDao.remove(minerConfig);
     }
 }
