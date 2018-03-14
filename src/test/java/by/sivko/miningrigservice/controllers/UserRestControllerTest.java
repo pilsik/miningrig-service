@@ -39,7 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserRestControllerTest {
 
     private static final int SUCCESSES_STATUS = 200;
-    private static final int RESPONSE_BAD_STATUS = 400;
     private static final int SUCCESSES_CREATED_STATUS = 201;
     private static final int RESPONSE_CONFLICT_BAD_STATUS = 409;
     private static final String USER_NAME = "USER_NAME";
@@ -95,7 +94,7 @@ public class UserRestControllerTest {
                 .when(principal.getName())
                 .thenReturn(USER_NAME);
         Mockito.when(userService.getAllUsers())
-                .thenReturn(new ArrayList<User>(Arrays.asList(userReturnMock, userReturnMock2)));
+                .thenReturn(new ArrayList<>(Arrays.asList(userReturnMock, userReturnMock2)));
     }
 
     @Test

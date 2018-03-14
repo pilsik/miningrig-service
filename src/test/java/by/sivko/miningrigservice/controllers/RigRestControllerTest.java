@@ -83,9 +83,6 @@ public class RigRestControllerTest {
     @Mock
     Principal mockPrincipalForSecondUser;
 
-    @Mock
-    Principal mockPrincipalWithMockRig;
-
     @Autowired
     @InjectMocks
     RigRestController rigRestController;

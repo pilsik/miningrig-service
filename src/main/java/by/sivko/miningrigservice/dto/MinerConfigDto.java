@@ -12,11 +12,27 @@ public class MinerConfigDto {
     @NotEmpty(message = "*Please provide your commandLine")
     private String commandLine;
 
+    public MinerConfigDto(String name, String commandLine) {
+        this.name = name;
+        this.commandLine = commandLine;
+    }
+
+    public MinerConfigDto() {
+    }
+
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getCommandLine() {
         return commandLine;
+    }
+
+    public void setCommandLine(String commandLine) {
+        this.commandLine = commandLine;
     }
 }
