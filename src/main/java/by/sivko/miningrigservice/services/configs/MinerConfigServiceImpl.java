@@ -5,7 +5,10 @@ import by.sivko.miningrigservice.models.configs.MinerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
 public class MinerConfigServiceImpl implements MinerConfigService {
 
     private final MinerConfigDao minerConfigDao;

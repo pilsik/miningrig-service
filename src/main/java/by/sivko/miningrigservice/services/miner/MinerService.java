@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface MinerService {
     Miner getMinerById(Long id);
+
     List<Miner> getAllMiners();
+
     Miner getMinerByName(String name);
 }

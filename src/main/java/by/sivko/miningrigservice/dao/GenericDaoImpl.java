@@ -18,9 +18,8 @@ public class GenericDaoImpl<T, PK extends Serializable> implements GenericDao<T,
     }
 
     @Override
-    public T save(T t) {
+    public void save(T t) {
         this.entityManager.persist(t);
-        return t;
     }
 
     @Override
